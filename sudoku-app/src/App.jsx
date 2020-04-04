@@ -1,10 +1,11 @@
 import React from 'react';
-// import _ from 'lodash';
+import { Banner } from './components/Banner'
 import 'bulma/css/bulma.css';
 
 function App() {
   return (
     <div>
+      <Banner />
     </div>
   );
 }
