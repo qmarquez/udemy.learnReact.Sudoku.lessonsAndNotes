@@ -4,6 +4,7 @@ import Tools from './components/Tools';
 import 'bulma/css/bulma.css';
 import Board from './components/Board';
 import config from './config';
+import GameInfo from './components/GameInfo';
 import NewGame from './Controls/NewGame';
 
 class App extends React.Component {
@@ -11,6 +12,10 @@ class App extends React.Component {
   state = {
     cellsValue: new Array(config.N_ROWS * config.N_COLUMNS).fill(""),
     cellsBackgroundColor: new Array(config.N_ROWS * config.N_COLUMNS).fill(".bg-white"),
+    gameLevel: null,
+    complexityLevel: null,
+    complexityLog: 1,
+    countEmptyCells: config.N_ROWS * config.N_COLUMNS,
   };
 
   solve = () => {
@@ -21,7 +26,12 @@ class App extends React.Component {
   }
   newGame = () => {
     const newGame = NewGame.getRandomLevel();
-    this.setState({ cellsValue: [...newGame.board] });
+    this.setState(
+      {
+        cellsValue: [...newGame.board],
+        gameLevel: newGame.dificult
+      }
+    );
   }
   deleteGame = () => {
 
@@ -41,19 +51,53 @@ class App extends React.Component {
 
   render() {
     return (<div>
-      <Banner />
-      <Tools
-        solve={this.solve}
-        stop={this.stop}
-        newGame={this.newGame}
-        deleteGame={this.deleteGame}
-        getThisAsStr={this.getThisAsStr}
-        goBack={this.goBack} />
-      <Board
-        handleChange={this.handleChange}
-        handleFocus={this.handleFocus}
-        cellsValue={this.state.cellsValue}
-        cellsBackgroundColor={this.state.cellsBackgroundColor} />
+      <section className="hero is-fullheight">
+        <div className="container is-fluid">
+          <Banner />
+          <div className="container">
+            <Tools
+              solve={this.solve}
+              stop={this.stop}
+              newGame={this.newGame}
+              deleteGame={this.deleteGame}
+              getThisAsStr={this.getThisAsStr}
+              goBack={this.goBack} />
+          </div>
+          <div className="container">
+            <div className="columns">
+              <div className="column">
+                <Board
+                  handleChange={this.handleChange}
+                  handleFocus={this.handleFocus}
+                  cellsValue={this.state.cellsValue}
+                  cellsBackgroundColor={this.state.cellsBackgroundColor} />
+              </div>
+              <div className="column">
+                <GameInfo
+                  gameLevel={this.state.gameLevel}
+                  complexityLevel={this.state.complexityLevel}
+                  complexityLog={this.state.complexityLog}
+                  countEmptyCells={this.state.countEmptyCells}
+                />
+              </div>
+              <div className="column">
+                <div className="columns">
+                  <div className="row">
+                    <div className="column">Analisys</div>
+                    <div className="column">Solveds</div>
+                    <div className="column">Input Box</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer className="footer">
+          <div className="content has-text-centered">
+            <p>Sudoku game with React 2020</p>
+          </div>
+        </footer>
+      </section>
     </div >
     );
   }

@@ -5,5 +5,10 @@ export default {
     EASY: "easy",
     MEDIUM: "medium",
     HARD: "hard"
+  },
+  CLASS_FOR_DIFICULT: {
+    easy: "is-success",
+    medium: "is-warning",
+    hard: "is-danger"
   }
 }
