@@ -4,12 +4,13 @@ import Tools from './components/Tools';
 import 'bulma/css/bulma.css';
 import Board from './components/Board';
 import config from './config';
+import NewGame from './Controls/NewGame';
 
 class App extends React.Component {
 
   state = {
-    cellsValue: new Array(config.N_ROWS * config.N_CELLS).fill(""),
-    cellsBackgroundColor: new Array(config.N_ROWS * config.N_CELLS).fill(".bg-white"),
+    cellsValue: new Array(config.N_ROWS * config.N_COLUMNS).fill(""),
+    cellsBackgroundColor: new Array(config.N_ROWS * config.N_COLUMNS).fill(".bg-white"),
   };
 
   solve = () => {
@@ -19,7 +20,8 @@ class App extends React.Component {
 
   }
   newGame = () => {
-
+    const newGame = NewGame.getRandomLevel();
+    this.setState({ cellsValue: [...newGame.board] });
   }
   deleteGame = () => {
 

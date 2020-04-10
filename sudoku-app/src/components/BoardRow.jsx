@@ -13,7 +13,7 @@ export default ({ rowNumber, handleChange, handleFocus, cellsValue, cellsBackgro
 
   const renderedCells = [];
 
-  for (let cell = 0; cell < config.N_CELLS; cell++) {
+  for (let cell = 0; cell < config.N_COLUMNS; cell++) {
     const cellKey = `${rowNumber + 1}${cell + 1}`;
     const value = getValueOfCell(cell);
     const cellClassName = getBgColor(cell)
