@@ -6,6 +6,7 @@ import Board from './components/Board';
 import config from './config';
 import GameInfo from './components/GameInfo';
 import NewGame from './Controls/NewGame';
+import ConsoleRight from './components/ConsoleRight';
 
 class App extends React.Component {
 
@@ -16,6 +17,8 @@ class App extends React.Component {
     complexityLevel: null,
     complexityLog: 1,
     countEmptyCells: config.N_ROWS * config.N_COLUMNS,
+    consoleMessage: 'First message',
+    numberOfSolved: 0
   };
 
   solve = () => {
@@ -46,6 +49,12 @@ class App extends React.Component {
 
   }
   handleFocus = () => {
+
+  }
+  handleShowFound = () => { 
+
+  }
+  sendConsole = () => { 
 
   }
 
@@ -83,8 +92,13 @@ class App extends React.Component {
               <div className="column">
                 <div className="columns">
                   <div className="row">
-                    <div className="column">Analisys</div>
-                    <div className="column">Solveds</div>
+                    <div className="column">
+                      <ConsoleRight
+                        consoleMessage={this.state.consoleMessage}
+                        numberOfSolved={this.state.numberOfSolved}
+                        showFound={this.handleShowFound}
+                      />
+                    </div>
                     <div className="column">Input Box</div>
                   </div>
                 </div>
