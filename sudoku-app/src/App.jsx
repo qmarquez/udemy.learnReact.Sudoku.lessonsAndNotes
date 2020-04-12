@@ -80,11 +80,21 @@ class App extends React.Component {
   goBack = () => {
 
   }
-  handleChange = () => {
+  handleChange = ({ target: { id, value } }) => {
+    // When user insert a new value:
+    const [row, column] = id.split("");
+    const indexCell = (row - 1) * 9 + (column - 1);
+    const cellsValue = [...this.state.cellsValue];
+    const iValue = parseInt(value, 10);
 
+    cellsValue[indexCell] = value;
+    if (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS)) {
+      this.setState({ cellsValue });
+    }
   }
-  handleFocus = () => {
-
+  handleFocus = ({ target: { id, value } }) => {
+    console.log('id :', id);
+    console.log('value :', value);
   }
   handleShowFound = () => {
 
@@ -134,7 +144,7 @@ class App extends React.Component {
                     />
                     {
                       this.state.messageBoxBelowValue &&
-                      <div className="has-text-centered is-size-4 messageBoxBelow" dangerouslySetInnerHTML={{__html:this.state.messageBoxBelowValue}}>
+                      <div className="has-text-centered is-size-4 messageBoxBelow" dangerouslySetInnerHTML={{ __html: this.state.messageBoxBelowValue }}>
                       </div>
                     }
                   </div>
