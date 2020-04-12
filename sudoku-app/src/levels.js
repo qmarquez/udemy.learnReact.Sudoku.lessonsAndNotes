@@ -1,5 +1,6 @@
 import config from "./config";
 
+// [[value, row, column]...]
 export default [
   {
     id: 1,

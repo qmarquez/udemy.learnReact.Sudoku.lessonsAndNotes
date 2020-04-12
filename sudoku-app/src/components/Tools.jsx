@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default (props) => {
-  const { solve, stop, newGame, deleteGame, getThisAsStr, goBack } = props;
+  const { solve, stop, newGame, deleteGame, getBoardCoords, goBack } = props;
 
   return (
     <div className="container">
@@ -23,7 +23,7 @@ export default (props) => {
         </p>
 
         <p className="control">
-          <button className="button is-small is-info" onClick={getThisAsStr}>Get this</button>
+          <button className="button is-small is-info" onClick={getBoardCoords}>Get this</button>
         </p>
 
         <p className="control">

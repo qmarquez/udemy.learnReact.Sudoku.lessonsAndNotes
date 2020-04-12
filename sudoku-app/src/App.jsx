@@ -61,10 +61,21 @@ class App extends React.Component {
       }
     );
   }
+  getBoardCoords = () => {
+    let strCoords = "[";
 
-  }
-  getThisAsStr = () => {
+    this.state
+      .cellsValue
+      .forEach((value, i) => {
+        const column = i % config.N_COLUMNS;
+        const row = Math.floor(i / config.N_ROWS);
+        if (value) {
+          strCoords += `[${value},${row},${column}],`
+        }
+      });
+    const messageBoxBelowValue = strCoords.slice(0, -1) + "]";
 
+    this.setState({ messageBoxBelowValue });
   }
   goBack = () => {
 
@@ -93,7 +104,7 @@ class App extends React.Component {
               stop={this.stop}
               newGame={this.newGame}
               deleteGame={this.deleteGame}
-              getThisAsStr={this.getThisAsStr}
+              getBoardCoords={this.getBoardCoords}
               goBack={this.goBack} />
           </div>
           <div className="container">
