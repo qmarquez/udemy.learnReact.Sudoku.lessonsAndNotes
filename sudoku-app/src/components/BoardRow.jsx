@@ -25,7 +25,7 @@ export default ({ rowNumber, handleChange, handleFocus, cellsValue, cellsBackgro
         <input
           id={cellKey}
           key={cellKey}
-          type="text"
+          type="number"
           name="name"
           className={cellClassName}
           onChange={handleChange}

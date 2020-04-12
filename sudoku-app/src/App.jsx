@@ -5,20 +5,33 @@ import 'bulma/css/bulma.css';
 import Board from './components/Board';
 import config from './config';
 import GameInfo from './components/GameInfo';
-import NewGame from './Controls/NewGame';
 import ConsoleRight from './components/ConsoleRight';
+import getRandomLevel from './Controls/getRandomLevel';
 
 class App extends React.Component {
 
+  get totalCells() {
+    return config.N_ROWS * config.N_COLUMNS
+  }
+
+  get emptyBoard() {
+    return new Array(this.totalCells).fill("");
+  }
+
+  get whiteBgColorBoard() {
+    return new Array(this.totalCells).fill(".bg-white")
+  }
+
   state = {
-    cellsValue: new Array(config.N_ROWS * config.N_COLUMNS).fill(""),
-    cellsBackgroundColor: new Array(config.N_ROWS * config.N_COLUMNS).fill(".bg-white"),
+    cellsValue: this.emptyBoard,
+    cellsBackgroundColor: this.whiteBgColorBoard,
     gameLevel: null,
     complexityLevel: null,
     complexityLog: 1,
-    countEmptyCells: config.N_ROWS * config.N_COLUMNS,
+    countEmptyCells: this.totalCells,
     consoleMessage: 'First message',
-    numberOfSolved: 0
+    numberOfSolved: 0,
+    messageBoxBelowValue: ''
   };
 
   solve = () => {
@@ -28,15 +41,26 @@ class App extends React.Component {
 
   }
   newGame = () => {
-    const newGame = NewGame.getRandomLevel();
+    const { board, dificult } = getRandomLevel();
     this.setState(
       {
-        cellsValue: [...newGame.board],
-        gameLevel: newGame.dificult
+        cellsValue: [...board],
+        gameLevel: dificult,
+        cellsBackgroundColor: this.whiteBgColorBoard,
+        messageBoxBelowValue: config.FACE_FOR_DIFICULT[dificult]
       }
     );
   }
   deleteGame = () => {
+    this.setState(
+      {
+        cellsValue: this.emptyBoard,
+        cellsBackgroundColor: this.whiteBgColorBoard,
+        gameLevel: '',
+        messageBoxBelowValue: ''
+      }
+    );
+  }
 
   }
   getThisAsStr = () => {
@@ -51,10 +75,10 @@ class App extends React.Component {
   handleFocus = () => {
 
   }
-  handleShowFound = () => { 
+  handleShowFound = () => {
 
   }
-  sendConsole = () => { 
+  sendConsole = () => {
 
   }
 
@@ -91,15 +115,17 @@ class App extends React.Component {
               </div>
               <div className="column">
                 <div className="columns">
-                  <div className="row">
-                    <div className="column">
-                      <ConsoleRight
-                        consoleMessage={this.state.consoleMessage}
-                        numberOfSolved={this.state.numberOfSolved}
-                        showFound={this.handleShowFound}
-                      />
-                    </div>
-                    <div className="column">Input Box</div>
+                  <div className="column">
+                    <ConsoleRight
+                      consoleMessage={this.state.consoleMessage}
+                      numberOfSolved={this.state.numberOfSolved}
+                      showFound={this.handleShowFound}
+                    />
+                    {
+                      this.state.messageBoxBelowValue &&
+                      <div className="has-text-centered is-size-4 messageBoxBelow" dangerouslySetInnerHTML={{__html:this.state.messageBoxBelowValue}}>
+                      </div>
+                    }
                   </div>
                 </div>
               </div>

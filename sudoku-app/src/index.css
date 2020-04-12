@@ -25,3 +25,10 @@
 .bg-coral {
   background-color: coral !important;
 }
+
+.messageBoxBelow { 
+  border: 2px solid #dedede;
+  border-radius: 10px;
+  margin-top: 15px;
+  padding: 5px 0;
+}

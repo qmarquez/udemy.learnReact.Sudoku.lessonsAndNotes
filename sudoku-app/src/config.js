@@ -10,5 +10,10 @@ export default {
     easy: "is-success",
     medium: "is-warning",
     hard: "is-danger"
+  },
+  FACE_FOR_DIFICULT: {
+    easy: "🥳",
+    medium: "😐",
+    hard: "😨"
   }
 }
