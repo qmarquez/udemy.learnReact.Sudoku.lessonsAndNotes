@@ -7,6 +7,7 @@ import config from './config';
 import GameInfo from './components/GameInfo';
 import ConsoleRight from './components/ConsoleRight';
 import getRandomLevel from './Controls/getRandomLevel';
+import _ from 'lodash';
 
 class App extends React.Component {
 
@@ -33,6 +34,24 @@ class App extends React.Component {
     numberOfSolved: 0,
     messageBoxBelowValue: ''
   };
+
+  cellInfo(cell_IdOrIndex, value) {
+    const [row, column] = typeof cell_IdOrIndex === 'string' ?
+      [
+        parseInt(cell_IdOrIndex[0]) - 1,
+        parseInt(cell_IdOrIndex[1]) - 1
+      ] : [
+        Math.floor(cell_IdOrIndex / config.N_ROWS),
+        Math.floor(cell_IdOrIndex % config.N_COLUMNS)
+      ];
+    const indexCell = typeof cell_IdOrIndex === 'number' ? cell_IdOrIndex : row * 9 + column;
+
+    const cubeRow = Math.floor((row) / 3);
+    const cubeColumn = Math.floor((column) / 3)
+    const cubeIndex = cubeRow * 3 + cubeColumn;
+
+    return { row, column, indexCell, cubeIndex, iValue: parseInt(value, 10) };
+  }
 
   solve = () => {
 
@@ -82,25 +101,63 @@ class App extends React.Component {
   }
   handleChange = ({ target: { id, value } }) => {
     // When user insert a new value:
-    const [row, column] = id.split("");
-    const indexCell = (row - 1) * 9 + (column - 1);
+    const { indexCell, row, column, iValue } = this.cellInfo(id, value);
     const cellsValue = [...this.state.cellsValue];
-    const iValue = parseInt(value, 10);
 
     cellsValue[indexCell] = value;
-    if (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS)) {
-      this.setState({ cellsValue });
+
+    if ((value === "") || (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS))) {
+      const consoleMessage = `Cell filled { ROW: ${row}, COLUMN: ${column} } [VALUE: ${value}]`;
+      this.setState({ cellsValue, consoleMessage });
     }
   }
   handleFocus = ({ target: { id, value } }) => {
-    console.log('id :', id);
-    console.log('value :', value);
+    // Color connected cells
+    const {
+      row: focusedRow,
+      column: focusedColumn,
+      cubeIndex: focusedCubeIndex,
+      iValue
+    } = this.cellInfo(id, value);
+
+    const relatedCells = [];
+    const cellsBackgroundColor = this.emptyBoard
+      .map(
+        (value, index) => {
+          const { row, column, cubeIndex } = this.cellInfo(index);
+          let finalBg = 'bg-white';
+          if (row === focusedRow && column === focusedColumn) {
+            finalBg = 'bg-aqua';
+          } else if (row === focusedRow || column === focusedColumn || cubeIndex === focusedCubeIndex) {
+            finalBg = 'bg-coral';
+          }
+
+          if (finalBg !== 'bg-white') {
+            relatedCells.push(parseInt(this.state.cellsValue[index], 10));
+          }
+
+          return finalBg;
+        }
+      );
+
+    // Show cell info
+    if (iValue) {
+      this.sendConsole(`Cell filled { ROW: ${focusedRow}, COLUMN: ${focusedColumn} } [VALUE: ${iValue}]`);
+    } else {
+      // Calc available values for that cell
+      const availableValues = _.difference(config.AVAILABLE_VALUES, relatedCells);
+
+      this.sendConsole(`{ ROW: ${focusedRow}, COLUMN: ${focusedColumn} } [${availableValues.toString()}]`)
+    }
+
+    this.setState({ cellsBackgroundColor });
   }
+
   handleShowFound = () => {
 
   }
-  sendConsole = () => {
-
+  sendConsole = (consoleMessage) => {
+    this.setState({ consoleMessage });
   }
 
   render() {

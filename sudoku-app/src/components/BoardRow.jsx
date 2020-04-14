@@ -16,7 +16,7 @@ export default ({ rowNumber, handleChange, handleFocus, cellsValue, cellsBackgro
   for (let cell = 0; cell < config.N_COLUMNS; cell++) {
     const cellKey = `${rowNumber + 1}${cell + 1}`;
     const value = getValueOfCell(cell);
-    const cellClassName = getBgColor(cell)
+    const cellClassName = getBgColor(cell);
 
     const tdClassName = isThirdPosition(cell) ? 'square-septd' : 'square';
 
