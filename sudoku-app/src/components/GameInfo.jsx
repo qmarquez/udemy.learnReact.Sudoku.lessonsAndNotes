@@ -21,24 +21,23 @@ const GameInfo = ({ gameLevel, complexityLevel, complexityLog, countEmptyCells }
             </span>
           </p>
         </div>
-        <a href="#" className="panel-block is-active">
-          <span className="panel-icon"><i className="fas fa-book" aria-hidden="true"></i></span>
+        <a className="panel-block">
           {
             gameLevel ?
               <span className={`tag is-large ${cName}`}>{gameLevel}</span>
               : <span className={`tag is-large`}>Waiting for new game</span>
           }
         </a>
-        <a href="#" className="panel-block">
-          <span className="panel-icon"><i className="fas fa-book" aria-hidden="true"></i></span>
+        <a className="panel-block">
+          <span className="panel-icon"><i className="fas fa-border-all" aria-hidden="true"></i></span>
           Empty cells: {countEmptyCells}
         </a>
-        <a href="#" className="panel-block">
-          <span className="panel-icon"><i className="fas fa-book" aria-hidden="true"></i></span>
+        <a className="panel-block">
+          <span className="panel-icon"><i className="fas fa-drafting-compass" aria-hidden="true"></i></span>
           Complexity: {complexityLevel}
         </a>
-        <a href="#" className="panel-block">
-          <span className="panel-icon"><i className="fas fa-book" aria-hidden="true"></i></span>
+        <a className="panel-block">
+          <span className="panel-icon"><i className="fas fa-drafting-compass" aria-hidden="true"></i></span>
           Complexity log: {complexityLog}
         </a>
       </article>

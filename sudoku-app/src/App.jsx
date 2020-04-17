@@ -30,9 +30,12 @@ class App extends React.Component {
     complexityLevel: null,
     complexityLog: 1,
     countEmptyCells: this.totalCells,
-    consoleMessage: 'First message',
+    consoleMessage: '',
     numberOfSolved: 0,
-    messageBoxBelowValue: ''
+    messageBoxBelowValue: '',
+    showRelatedCells: false,
+    focusedCellRelatedCells: [],
+    movementsHistory: [this.emptyBoard]
   };
 
   cellInfo(cell_IdOrIndex, value) {
@@ -50,15 +53,21 @@ class App extends React.Component {
     const cubeColumn = Math.floor((column) / 3)
     const cubeIndex = cubeRow * 3 + cubeColumn;
 
-    return { row, column, indexCell, cubeIndex, iValue: parseInt(value, 10) };
+    return { row, column, indexCell, cubeIndex, iValue: parseInt(value || 0, 10) };
+  }
+
+  countEmptyCells(board = this.state.cellsValue) {
+    return board.reduce((acc, cell) => cell ? acc : ++acc, 0)
   }
 
   solve = () => {
 
   }
+
   stop = () => {
 
   }
+
   newGame = () => {
     const { board, dificult } = getRandomLevel();
     this.setState(
@@ -66,20 +75,26 @@ class App extends React.Component {
         cellsValue: [...board],
         gameLevel: dificult,
         cellsBackgroundColor: this.whiteBgColorBoard,
-        messageBoxBelowValue: config.FACE_FOR_DIFICULT[dificult]
+        messageBoxBelowValue: config.FACE_FOR_DIFICULT[dificult],
+        countEmptyCells: this.countEmptyCells(board),
+        movementsHistory: [board]
       }
     );
   }
+
   deleteGame = () => {
     this.setState(
       {
         cellsValue: this.emptyBoard,
         cellsBackgroundColor: this.whiteBgColorBoard,
         gameLevel: '',
-        messageBoxBelowValue: ''
+        messageBoxBelowValue: '',
+        countEmptyCells: this.totalCells,
+        movementsHistory: [this.emptyBoard]
       }
     );
   }
+
   getBoardCoords = () => {
     let strCoords = "[";
 
@@ -96,21 +111,61 @@ class App extends React.Component {
 
     this.setState({ messageBoxBelowValue });
   }
-  goBack = () => {
 
+  goBack = () => {
+    const movementsHistory = [...this.state.movementsHistory];
+    if (movementsHistory.length > 1) {
+      const cellsValue = movementsHistory.pop();
+      this.setState({ cellsValue, cellsBackgroundColor: this.whiteBgColorBoard, movementsHistory });
+    } else {
+      this.sendConsole('Beginning of game');
+    }
   }
+
   handleChange = ({ target: { id, value } }) => {
     // When user insert a new value:
     const { indexCell, row, column, iValue } = this.cellInfo(id, value);
-    const cellsValue = [...this.state.cellsValue];
+    const isUsedValue = this.state
+      .focusedCellRelatedCells
+      .map(({ value }) => value)
+      .includes(iValue);
 
-    cellsValue[indexCell] = value;
+    if (value === "" || (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS) && !isUsedValue)) {
+      const cellsValue = [...this.state.cellsValue];
+      const consoleMessage = `Cell filled { row: ${row}, column: ${column} } [value: ${value}]`;
 
-    if ((value === "") || (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS))) {
-      const consoleMessage = `Cell filled { ROW: ${row}, COLUMN: ${column} } [VALUE: ${value}]`;
-      this.setState({ cellsValue, consoleMessage });
+      // Save history
+      const movementsHistory = [...this.state.movementsHistory];
+      movementsHistory.push([...cellsValue]);
+
+      // Update board
+      cellsValue[indexCell] = iValue || "";
+
+      this.setState(
+        { cellsValue, consoleMessage, movementsHistory, countEmptyCells: this.countEmptyCells(cellsValue) },
+        () => {
+          const nextId = this.state.cellsValue.indexOf("", indexCell === this.totalCells - 1 ? 0 : indexCell);
+          const { row, column } = this.cellInfo(nextId);
+          return document.getElementById(`${row + 1}${column + 1}`)?.focus()
+        }
+      );
+    } else {
+      // highlight error cells
+      const cellsBackgroundColor = this.state.showRelatedCells ? this.state.cellsBackgroundColor : this.whiteBgColorBoard;
+      this.state
+        .focusedCellRelatedCells
+        .forEach(
+          ({ index, value }) => {
+            if (value === iValue) {
+              cellsBackgroundColor[index] = 'bg-coral'
+            }
+          }
+        );
+
+      this.setState({ cellsBackgroundColor });
     }
   }
+
   handleFocus = ({ target: { id, value } }) => {
     // Color connected cells
     const {
@@ -120,44 +175,52 @@ class App extends React.Component {
       iValue
     } = this.cellInfo(id, value);
 
-    const relatedCells = [];
+    const focusedCellRelatedCells = [];
     const cellsBackgroundColor = this.emptyBoard
       .map(
         (value, index) => {
           const { row, column, cubeIndex } = this.cellInfo(index);
           let finalBg = 'bg-white';
-          if (row === focusedRow && column === focusedColumn) {
-            finalBg = 'bg-aqua';
-          } else if (row === focusedRow || column === focusedColumn || cubeIndex === focusedCubeIndex) {
-            finalBg = 'bg-coral';
+
+
+          if (row === focusedRow || column === focusedColumn || cubeIndex === focusedCubeIndex) {
+            finalBg = this.state.showRelatedCells ? 'bg-coral' : finalBg;
+            focusedCellRelatedCells.push({ index, value: parseInt(this.state.cellsValue[index], 10) });
           }
 
-          if (finalBg !== 'bg-white') {
-            relatedCells.push(parseInt(this.state.cellsValue[index], 10));
+          if (row === focusedRow && column === focusedColumn) {
+            finalBg = this.state.showRelatedCells ? 'bg-aqua' : finalBg;
           }
 
           return finalBg;
         }
       );
 
-    // Show cell info
+    // Show cell info;
+    let consoleMessage;
+    const focusedCellAvailableValues = []
     if (iValue) {
-      this.sendConsole(`Cell filled { ROW: ${focusedRow}, COLUMN: ${focusedColumn} } [VALUE: ${iValue}]`);
+      consoleMessage = `Cell filled { row: ${focusedRow}, column: ${focusedColumn} } [value: ${iValue}]`;
     } else {
       // Calc available values for that cell
-      const availableValues = _.difference(config.AVAILABLE_VALUES, relatedCells);
-
-      this.sendConsole(`{ ROW: ${focusedRow}, COLUMN: ${focusedColumn} } [${availableValues.toString()}]`)
+      focusedCellAvailableValues.push(..._.difference(config.AVAILABLE_VALUES, focusedCellRelatedCells.map(({ value }) => value)));
+      consoleMessage = `{ row: ${focusedRow}, column: ${focusedColumn} } [${focusedCellAvailableValues.toString()}]`;
     }
 
-    this.setState({ cellsBackgroundColor });
+    this.sendConsole(consoleMessage);
+    this.setState({ cellsBackgroundColor, focusedCellRelatedCells });
   }
 
   handleShowFound = () => {
 
   }
+
   sendConsole = (consoleMessage) => {
     this.setState({ consoleMessage });
+  }
+
+  toggleShowRelatedCells = () => {
+    this.setState({ showRelatedCells: !this.state.showRelatedCells });
   }
 
   render() {
@@ -172,7 +235,10 @@ class App extends React.Component {
               newGame={this.newGame}
               deleteGame={this.deleteGame}
               getBoardCoords={this.getBoardCoords}
-              goBack={this.goBack} />
+              goBack={this.goBack}
+              showRelatedCells={this.state.showRelatedCells}
+              toggleShowRelatedCells={this.toggleShowRelatedCells}
+            />
           </div>
           <div className="container">
             <div className="columns">

@@ -1,7 +1,8 @@
 import React from 'react';
 
 export default (props) => {
-  const { solve, stop, newGame, deleteGame, getBoardCoords, goBack } = props;
+  const { solve, stop, newGame, deleteGame, getBoardCoords, goBack,
+    showRelatedCells, toggleShowRelatedCells } = props;
 
   return (
     <div className="container">
@@ -29,6 +30,10 @@ export default (props) => {
         <p className="control">
           <button className="button is-small is-warning" onClick={goBack}>Go back</button>
         </p>
+      </div>
+      <div className="field">
+        <input id="showRelatedCells" type="checkbox" onChange={toggleShowRelatedCells} checked={showRelatedCells} />
+        <label htmlFor="showRelatedCells">Show related cells </label>
       </div>
     </div>
   )
