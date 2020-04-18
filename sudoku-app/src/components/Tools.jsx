@@ -2,7 +2,8 @@ import React from 'react';
 
 export default (props) => {
   const { solve, stop, newGame, deleteGame, getBoardCoords, goBack,
-    showRelatedCells, toggleShowRelatedCells } = props;
+    showRelatedCells, toggleShowRelatedCells,
+    isStoped } = props;
 
   return (
     <div className="container">
@@ -12,7 +13,7 @@ export default (props) => {
         </p>
 
         <p className="control">
-          <button className="button is-small is-warning" onClick={stop}>Stop</button>
+          <button className={`button is-small ${isStoped ? 'is-success' : 'is-warning'}`} onClick={stop}>{isStoped ? 'Unblock' : 'Stop'}</button>
         </p>
 
         <p className="control">

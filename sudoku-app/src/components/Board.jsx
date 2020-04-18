@@ -16,7 +16,7 @@ export default (props) => {
     <div className="container">
       <hr />
       <div className="card">
-        <table>
+        <table className="board">
           <tbody>
             {renderedBoard}
           </tbody>
