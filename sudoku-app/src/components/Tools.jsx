@@ -1,9 +1,8 @@
 import React from 'react';
 
 export default (props) => {
-  const { solve, stop, newGame, deleteGame, getBoardCoords, goBack,
-    showRelatedCells, toggleShowRelatedCells,
-    isStoped } = props;
+  const { solve, stop, newGame, deleteGame, getBoardCoords, goBack, generateNewCompleteBoard,
+    showRelatedCells, toggleShowRelatedCells, isStoped } = props;
 
   return (
     <div className="container">
@@ -30,6 +29,10 @@ export default (props) => {
 
         <p className="control">
           <button className="button is-small is-warning" onClick={goBack}>Go back</button>
+        </p>
+
+        <p className="control">
+          <button className="button is-small is-success" onClick={generateNewCompleteBoard}>New complete board</button>
         </p>
       </div>
       <div className="field">

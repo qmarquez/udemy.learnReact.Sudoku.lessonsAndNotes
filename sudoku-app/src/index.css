@@ -48,3 +48,18 @@ input[type=number] {
 .board {
   margin: auto;
 }
+
+.game-info-row {
+  display         : block;
+  width           : 100%;
+  background-color: #fff;
+  cursor          : pointer;
+  border          : none;
+  border-bottom   : 1px solid #ededed;
+  outline         : none;
+  font-size       : 1rem;
+}
+
+.game-info-row:hover {
+  background-color: whitesmoke;
+}

@@ -25,7 +25,7 @@ export default (board, useSafeQuantity = true) => {
         } else return undefined;
       }
     )
-    .filter(cell => cell && useSafeQuantity ? cell.values.length === 2 : true);
+    .filter(cell => cell && (useSafeQuantity ? cell.values.length === 2 : true));
 
   if (!candidates.length) { return []; }
 

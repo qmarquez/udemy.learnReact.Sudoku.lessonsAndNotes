@@ -38,15 +38,16 @@ class App extends React.Component {
     consoleMessage: '',
     numberOfSolved: 0,
     messageBoxBelowValue: '',
-    showRelatedCells: false,
+    showRelatedCells: true,
     focusedCellRelatedCells: [],
     movementsHistory: [this.emptyBoard],
-    stop: false
+    stop: false,
+    foundItemsStore: []
   };
 
   calcGameInfo = (board = this.state.cellsValue) => gameInfo(board);
 
-  solve = () => {
+  solve = (useSafeQuantity = true) => {
     if (this.state.stop) { return; }
     const safeBoard = [...this.state.cellsValue];
     let values;
@@ -59,7 +60,7 @@ class App extends React.Component {
     this.updateBoardWithFoundedValues(values);
     if (values.length) { return; }
 
-    values = solveAlgorithm_3(safeBoard);
+    values = solveAlgorithm_3(safeBoard, useSafeQuantity);
     this.updateBoardWithFoundedValues(values);
     if (values.length) { return; }
   }
@@ -67,8 +68,8 @@ class App extends React.Component {
   updateBoardWithFoundedValues = (values) => {
     values.forEach(
       ({ cellIndex, value }) => {
-        const { row, column, iValue } = cellInfo(cellIndex, value);
-        this.updateBoard({ cellIndex, row, column, value, iValue });
+        const { row, column, iValue, cellId } = cellInfo(cellIndex, value);
+        this.updateBoard({ cellIndex, row, column, value, iValue, cellId });
       }
     );
 
@@ -138,16 +139,22 @@ class App extends React.Component {
     }
   }
 
+  generateNewCompleteBoard = () => {
+    this.deleteGame();
+    this.solve(true);
+  }
+
   handleChange = ({ target: { id, value } }) => {
     // When user insert a new value:
-    const { cellIndex, row, column, iValue } = cellInfo(id, value);
+    debugger;
+    const { cellIndex, row, column, iValue, cellId } = cellInfo(id, value);
     const isUsedValue = this.state
       .focusedCellRelatedCells
       .map(({ value }) => value)
       .includes(iValue);
 
     if (value === "" || (iValue > 0 && iValue <= Math.max(config.N_ROWS, config.N_COLUMNS) && !isUsedValue)) {
-      this.updateBoard({ cellIndex, row, column, value, iValue }, true);
+      this.updateBoard({ cellIndex, row, column, value, iValue, cellId }, true);
     } else {
       // highlight error cells
       const cellsBackgroundColor = this.state.showRelatedCells ? this.state.cellsBackgroundColor : this.whiteBgColorBoard;
@@ -166,7 +173,7 @@ class App extends React.Component {
   }
 
   updatingBoard
-  async updateBoard({ cellIndex, row, column, value, iValue }, moveFocus = false) {
+  async updateBoard({ cellIndex, row, column, value, iValue, cellId }, moveFocus = false) {
     if (this.updatingBoard) {
       await this.updatingBoard;
     }
@@ -186,8 +193,11 @@ class App extends React.Component {
         consoleMessage = config.FULLY_GAME_SOLVED_MESSAGE;
       }
 
+
+      const foundItemsStore = [...this.state.foundItemsStore, { id: cellId, iValue }];
+
       this.setState(
-        { cellsValue, consoleMessage, movementsHistory, countEmptyCells, complexityLog, complexityLevel },
+        { cellsValue, consoleMessage, movementsHistory, countEmptyCells, complexityLog, complexityLevel, foundItemsStore },
         () => {
           resolve();
           if (moveFocus) {
@@ -231,7 +241,7 @@ class App extends React.Component {
   }
 
   handleShowFound = () => {
-
+    this.sendConsole(JSON.stringify(this.state.foundItemsStore));
   }
 
   sendConsole = (consoleMessage) => {
@@ -258,6 +268,7 @@ class App extends React.Component {
               goBack={this.goBack}
               showRelatedCells={this.state.showRelatedCells}
               toggleShowRelatedCells={this.toggleShowRelatedCells}
+              generateNewCompleteBoard={this.generateNewCompleteBoard}
             />
           </div>
           <div className="container">
