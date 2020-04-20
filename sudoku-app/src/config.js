@@ -20,5 +20,7 @@ export default {
     easy: "🥳",
     medium: "😐",
     hard: "😨"
-  }
+  },
+  MAX_ITERATION: 1000,
+  FULLY_GAME_SOLVED_MESSAGE: 'Game fully solved!! Yayy!!'
 }

@@ -1,1 +1,1 @@
-export type ResolutionValues<ExtraDetails> = Array<{ cellIndex: number, value: number, extraDetails?: ExtraDetails }>;
+export type ResolutionValues<ExtraDetails = any> = Array<{ cellIndex: number, value: number, extraDetails?: ExtraDetails }>;

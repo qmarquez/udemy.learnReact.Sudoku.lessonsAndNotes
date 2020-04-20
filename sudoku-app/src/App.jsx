@@ -11,6 +11,8 @@ import cellInfo from './lib/cellInfo';
 import getRelatedCells from './lib/getRelatedCells';
 import solveAlgorithm_1 from './lib/solveAlgorithm_1';
 import solveAlgorithm_2 from './lib/solveAlgorithm_2';
+import solveAlgorithm_3 from './lib/solveAlgorithm_3';
+import gameInfo from './lib/gameInfo';
 
 class App extends React.Component {
 
@@ -42,30 +44,22 @@ class App extends React.Component {
     stop: false
   };
 
-  calcGameInfo(board = this.state.cellsValue) {
-    const countEmptyCells = board.reduce((acc, cell) => cell ? acc : ++acc, 0);
-    let complexityLevel = 1;
-    board.forEach(
-      (value, index) => {
-        if (!value) {
-          const { availableValues } = getRelatedCells(cellInfo(index, value), board);
-          complexityLevel *= availableValues.length;
-        }
-      }
-    );
-    const complexityLog = Math.log(complexityLevel) / Math.log(10);
-    return { countEmptyCells, complexityLevel, complexityLog };
-  }
+  calcGameInfo = (board = this.state.cellsValue) => gameInfo(board);
 
   solve = () => {
     if (this.state.stop) { return; }
+    const safeBoard = [...this.state.cellsValue];
     let values;
 
-    values = solveAlgorithm_1(this.state.cellsValue);
+    values = solveAlgorithm_1(safeBoard);
     this.updateBoardWithFoundedValues(values);
     if (values.length) { return; }
 
-    values = solveAlgorithm_2(this.state.cellsValue);
+    values = solveAlgorithm_2(safeBoard);
+    this.updateBoardWithFoundedValues(values);
+    if (values.length) { return; }
+
+    values = solveAlgorithm_3(safeBoard);
     this.updateBoardWithFoundedValues(values);
     if (values.length) { return; }
   }
@@ -177,8 +171,8 @@ class App extends React.Component {
       await this.updatingBoard;
     }
     this.updatingBoard = new Promise(resolve => {
+      let consoleMessage = `Cell filled { row: ${row}, column: ${column} } [value: ${value}]`;
       const cellsValue = [...this.state.cellsValue];
-      const consoleMessage = `Cell filled { row: ${row}, column: ${column} } [value: ${value}]`;
 
       // Save history
       const movementsHistory = [...this.state.movementsHistory];
@@ -188,6 +182,10 @@ class App extends React.Component {
       cellsValue[cellIndex] = iValue || "";
 
       const { countEmptyCells, complexityLog, complexityLevel } = this.calcGameInfo(cellsValue);
+      if (countEmptyCells === 0) {
+        consoleMessage = config.FULLY_GAME_SOLVED_MESSAGE;
+      }
+
       this.setState(
         { cellsValue, consoleMessage, movementsHistory, countEmptyCells, complexityLog, complexityLevel },
         () => {

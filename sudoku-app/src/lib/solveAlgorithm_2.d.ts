@@ -1,3 +1,4 @@
 import { ResolutionValues } from "./AlgResolutionValues";
+import { Board } from "./Board";
 
-export default function (board: Array<string | number>): ResolutionValues<{ using: string }>
+export default function (board: Board): ResolutionValues<{ using: string }>
