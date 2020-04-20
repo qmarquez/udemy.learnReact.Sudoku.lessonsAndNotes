@@ -9,7 +9,8 @@ import ConsoleRight from './components/ConsoleRight';
 import getRandomLevel from './lib/getRandomLevel';
 import cellInfo from './lib/cellInfo';
 import getRelatedCells from './lib/getRelatedCells';
-import onlyOneValueAvailableCells from './lib/1stAlg_onlyOneValueAvailableCells';
+import solveAlgorithm_1 from './lib/solveAlgorithm_1';
+import solveAlgorithm_2 from './lib/solveAlgorithm_2';
 
 class App extends React.Component {
 
@@ -58,18 +59,26 @@ class App extends React.Component {
 
   solve = () => {
     if (this.state.stop) { return; }
+    let values;
 
+    values = solveAlgorithm_1(this.state.cellsValue);
+    this.updateBoardWithFoundedValues(values);
+    if (values.length) { return; }
 
-    const onlyOneValueAvailable = onlyOneValueAvailableCells(this.state.cellsValue);
-    onlyOneValueAvailable.forEach(
-      ({ cellIndex, row, column, availableValue }) => {
-        const value = availableValue[0];
-        const iValue = value;
+    values = solveAlgorithm_2(this.state.cellsValue);
+    this.updateBoardWithFoundedValues(values);
+    if (values.length) { return; }
+  }
+
+  updateBoardWithFoundedValues = (values) => {
+    values.forEach(
+      ({ cellIndex, value }) => {
+        const { row, column, iValue } = cellInfo(cellIndex, value);
         this.updateBoard({ cellIndex, row, column, value, iValue });
       }
     );
 
-    if (onlyOneValueAvailable.length) {
+    if (values.length) {
       setTimeout(this.solve, 500);
     }
   }
